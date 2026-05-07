@@ -158,25 +158,337 @@ SELECT * FROM Dept WHERE tel LIKE "%30%";
 SELECT * FROM Dept WHERE depno IN (10, 30);
 SELECT * FROM Dept WHERE dname LIKE "경영__";
 
-SELECT * FROM SALE WHERE price > 50000 ;
-SELECT * FROM SALE WHERE price >= 50000 AND price < 100000 AND month = 1;
-SELECT * FROM SALE WHERE price BETWEEN 50000 AND 100000;
-SELECT * FROM SALE WHERE price NOT BETWEEN 50000 AND 100000;
-SELECT * FROM SALE WHERE year = 2024;
-SELECT * FROM SALE WHERE year = 2024 AND month = 2;
-SELECT * FROM SALE WHERE month IN (1, 2);
+SELECT * FROM Sale WHERE price > 50000 ;
+SELECT * FROM Sale WHERE price >= 50000 AND price < 100000 AND month = 1;
+SELECT * FROM Sale WHERE price BETWEEN 50000 AND 100000;
+SELECT * FROM Sale WHERE price NOT BETWEEN 50000 AND 100000;
+SELECT * FROM Sale WHERE year = 2024;
+SELECT * FROM Sale WHERE year = 2024 AND month = 2;
+SELECT * FROM Sale WHERE month IN (1, 2);
 
 # 실습 4-4
+SELECT * FROM Sale ORDER BY price;
+SELECT * FROM Sale ORDER BY price ASC;
+SELECT * FROM Sale ORDER BY price DESC;
+SELECT * FROM Employee ORDER BY name;
+SELECT * FROM Employee ORDER BY name DESC;
+SELECT * FROM Employee ORDER BY regdate ASC;
+SELECT * FROM Sale WHERE price > 50000 ORDER BY price DESC;
+SELECT * FROM Sale 
+WHERE price > 50000 
+ORDER BY year DESC, month, price DESC;
+
 # 실습 4-5
+SELECT * FROM Sale LIMIT 3;
+SELECT * FROM Sale LIMIT 0, 3;
+SELECT * FROM Sale LIMIT 1, 2;
+SELECT * FROM Sale LIMIT 5, 3;
+SELECT * FROM Sale ORDER BY price DESC LIMIT 3, 5;
+SELECT * FROM Sale WHERE price < 50000 ORDER BY price DESC LIMIT 3;
+SELECT * FROM Sale
+WHERE price > 50000
+ORDER BY year DESC, month, price DESC
+LIMIT 5;
+
 # 실습 4-6
+SELECT SUM(price) AS 합계 FROM Sale;
+SELECT AVG(price) AS 평균 FROM Sale;
+SELECT MAX(price) AS 최대값 FROM Sale;
+SELECT MIN(price) AS 최소값 FROM Sale;
+SELECT CEILING(1.2);
+SELECT CEILING(1.8);
+SELECT FLOOR(1.2);
+SELECT FLOOR(1.8);
+SELECT ROUND(1.2);
+SELECT ROUND(1.8);
+SELECT RAND();
+SELECT CEILING(RAND() * 10);
+SELECT COUNT(price) AS 갯수 FROM SALE;
+SELECT COUNT(*) AS 갯수 FROM SALE;
+
+SELECT LEFT("HelloWorld", 5);
+SELECT RIGHT("HelloWorld", 5);
+SELECT SUBSTRING("HelloWorld", 6, 5);
+SELECT CONCAT("Hello", "World");
+SELECT CONCAT(empno, name, hp) FROM Employee WHERE empno = 1008;
+
+SELECT CURDATE();
+SELECT CURTIME();
+SELECT NOW();
+
+INSERT INTO Employee SET
+	empno = 1012,
+    name = "을지문덕",
+    gender = 'F',
+    hp = "010-1234-1012",
+    regdate = NOW();
+
+SELECT * FROM Employee;
+
 # 실습 4-7
+SELECT 
+	SUM(price) AS "2018년 1월 매출총합" 
+FROM SALE
+WHERE 
+	year = "2018" AND
+	month = "1"; 
+    
 # 실습 4-8
+SELECT 
+	SUM(price) AS "2019년 2월 매출 합", 
+    AVG(price) AS "2019년 2월 매출 평균" 
+FROM SALE
+WHERE 
+	year = "2019" AND 
+    month = "2" AND 
+    price >= 50000;
+    
 # 실습 4-9
+SELECT 
+	MIN(price) AS "2020년 최저 매출", 
+    MAX(price) AS "2020년 최고 매출" 
+FROM SALE
+WHERE 
+	year = "2020";
+
 # 실습 4-10
+SELECT empno FROM Sale GROUP BY empno;
+SELECT year FROM Sale GROUP BY year;
+SELECT empno, year, COUNT(*) FROM Sale GROUP BY empno, year;
+
+SELECT 
+	empno, COUNT(*) AS 건수 
+FROM Sale 
+GROUP BY empno;
+
+SELECT 
+	empno, SUM(price) AS 합계 
+FROM Sale 
+GROUP BY empno;
+
+SELECT 
+	empno, AVG(price) AS 평균
+FROM Sale 
+GROUP BY empno;
+
+SELECT 
+	empno, year, SUM(price) AS 합계
+FROM Sale
+GROUP BY empno, year;
+
+SELECT 
+	empno, 
+    year, 
+    SUM(price) AS 합계
+FROM Sale
+GROUP BY empno, year
+ORDER BY year ASC, 합계 DESC;
+
+SELECT 
+	empno, 
+    year, 
+    SUM(price) AS 합계
+FROM Sale
+WHERE price >= 50000
+GROUP BY empno, year
+ORDER BY year ASC, 합계 DESC;
+
 # 실습 4-11
+SELECT 
+	empno,
+    SUM(price) AS 합계
+FROM Sale
+GROUP BY empno
+HAVING 합계 >= 200000; -- GROUP BY 결과의 조건
+
+SELECT 
+	empno, 
+    year, 
+    SUM(price) AS 합계
+FROM Sale
+WHERE price >= 100000
+GROUP BY empno, year
+HAVING 합계 >= 200000
+ORDER BY 합계 DESC;
+
 # 실습 4-12
+CREATE TABLE Sale2 LIKE Sale;
+INSERT INTO Sale2 SELECT * FROM Sale;
+UPDATE Sale2 SET year = year + 4;
+
+SELECT * FROM Sale
+UNION
+SELECT * FROM Sale2;
+
+SELECT * FROM Sale WHERE price >= 100000
+UNION
+SELECT * FROM Sale2 WHERE price >= 100000;
+
+SELECT empno, year, price FROM Sale
+UNION
+SELECT empno, year, price FROM Sale2;
+
+SELECT empno, year, SUM(price) AS 합계
+FROM Sale
+GROUP BY empno, year
+UNION
+SELECT empno, year, SUM(price) AS 합계
+FROM Sale2
+GROUP BY empno, year
+ORDER BY year ASC, 합계 DESC;
+
 # 실습 4-13
+SELECT * FROM Sale INNER JOIN Employee ON Sale.empno = Employee.empno;
+SELECT * FROM Employee INNER JOIN Dept ON Employee.depno = Dept.depno;
+
+SELECT * FROM Sale AS a 
+	JOIN Employee AS b 
+    ON a.empno = b.empno;
+    
+SELECT * FROM Employee AS a 
+		 JOIN Dept AS b 
+		 ON a.depno = b.depno;
+
+SELECT * FROM Sale AS a, Employee AS b WHERE a.empno = b.empno;
+SELECT * FROM Employee AS a, Dept AS b WHERE a.depno = b.depno;
+
+SELECT 
+	a.no,
+    a.empno,
+    price,
+    name,
+    job
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno;
+
+SELECT 
+	a.no,
+    a.empno,
+    price,
+    name,
+    job
+FROM Sale AS a
+JOIN Employee AS b
+USING (empno); -- 두 테이블의 컬럼명이 동일한 경우 USING 사용
+
+SELECT
+	a.no,
+    a.empno,
+    price,
+    name,
+    job
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno
+WHERE price >= 100000;
+
+SELECT 
+    a.empno,
+    a.year,
+    SUM(price) AS 합계
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno
+GROUP BY a.empno, a.year 
+HAVING 합계 >= 100000
+ORDER BY a.year ASC, 합계 DESC;
+    
+SELECT *
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno
+JOIN Dept AS c
+ON b.depno = c.depno;
+
+SELECT 
+	a.no,
+    a.empno,
+    a.price,
+    b.name,
+    b.job,
+    c.dname
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno
+JOIN Dept AS c
+on b.depno = c.depno;
+
+SELECT 
+	a.no,
+    a.empno,
+    a.price,
+    b.name,
+    b.job,
+    c.dname
+FROM Sale AS a
+JOIN Employee AS b
+ON a.empno = b.empno
+JOIN Dept AS c
+on b.depno = c.depno
+WHERE price > 100000
+ORDER BY price DESC;
+
 # 실습 4-14
+SELECT * 
+FROM Sale AS a 
+	LEFT JOIN Employee AS b 
+		ON a.empno = b.empno;
+
+SELECT * 
+FROM Sale AS a 
+RIGHT JOIN Employee AS b 
+ON a.empno = b.empno;
+
+SELECT 
+	a.no,
+	a.empno,
+    a.price,
+    b.name,
+    b.job
+FROM Sale AS a
+LEFT JOIN Employee AS b USING(empno);
+
+SELECT 
+	a.no,
+	a.empno,
+    a.price,
+    b.name,
+    b.job
+FROM Sale AS a
+RIGHT JOIN Employee AS b USING(empno);
+
+SELECT 
+	b.empno,
+    b.name,
+    b.job,
+    a.dname
+FROM Dept AS a
+JOIN Employee AS b USING(depno);
+
+SELECT
+	SUM(b.price) AS "김유신 2019 매출합"
+FROM Employee AS a
+JOIN Sale AS b
+	ON a.empno = b.empno
+WHERE a.name = "김유신" AND b.year = 2019;
+
+SELECT
+	a.empno,
+	b.name,
+    a.empno,
+    b.job,
+    a.year,
+    SUM(a.price) AS 매출합
+FROM Sale AS a
+JOIN Employee AS b ON a.empno = b.empno
+JOIN Dept AS c ON b.depno = c.depno
+WHERE a.year = 2019 
+  AND a.price >= 50000 
+GROUP BY a.empno 
+HAVING 매출합 >= 100000
+ORDER BY 매출합 DESC;
+
 # 실습 4-15
 # 실습 4-16
 # 실습 4-17
